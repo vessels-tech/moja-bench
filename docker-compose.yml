@@ -5,12 +5,39 @@ networks:
     name: ml-mojaloop-net
 
 services:
+  account-lookup-service:
+    image: mojaloop/account-lookup-service:latest
+    container_name: als_account-lookup-service
+    user: root
+    command:
+      - "sh"
+      - "-c"
+      - "sh /opt/wait-for/wait-for-account-lookup-service.sh && node src/index.js server"
+    ports:
+      - "4001:4001"
+      - "4002:4002"
+    networks:
+      - ml-mojaloop-net
+    depends_on:
+      - mysql-als
+      - central-ledger
+    volumes:
+      - ./src:/opt/account-lookup-service/src
+      - ./docker/account-lookup-service/default.json:/opt/account-lookup-service/config/default.json
+      - ./docker/wait-for:/opt/wait-for
+    healthcheck:
+      test: ["CMD", "sh", "-c" ,"apk --no-cache add curl", ";", "curl", "http://localhost:4001/health"]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+
   ml-api-adapter:
-    build:
-      context: .
-      cache_from:
-        - mojaloop/ml-api-adapter
-        - central-ledger
+    image: mojaloop/ml-api-adapter:latest
+    # build:
+    #   context: .
+    #   cache_from:
+    #     - mojaloop/ml-api-adapter
+    #     - central-ledger
     container_name: ml_ml-api-adapter
     # We must be root in order to install the health packages...
     user: root
@@ -69,7 +96,7 @@ services:
       retries: 10
       interval: 30s
 
-  mysql:
+  mysql-cl:
     image: mysql/mysql-server
     container_name: ml_mysql
     # Disable logging as it is far too verbose for debugging locally
@@ -78,7 +105,6 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      #this fixes the permissions issue, but docker-compose up will fail on first attempt
       - ./docker/sql-init/:/docker-entrypoint-initdb.d/
     environment:
       - MYSQL_USER=${DBUSER:-central_ledger}
@@ -89,6 +115,27 @@ services:
       - ml-mojaloop-net
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "mysql"]
+      timeout: 20s
+      retries: 10
+      start_period: 40s
+      interval: 30s
+  
+  mysql-als:
+    image: mysql/mysql-server
+    container_name: als_mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/sql-init-als/:/docker-entrypoint-initdb.d/
+    environment:
+      - MYSQL_USER=${DBUSER:-account_lookup}
+      - MYSQL_PASSWORD=${DBPASS:-password}
+      - MYSQL_DATABASE=${DBUSER:-account_lookup}
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    networks:
+      - ml-mojaloop-net
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "mysql-als"]
       timeout: 20s
       retries: 10
       start_period: 40s
@@ -116,8 +163,11 @@ services:
       start_period: 40s
       interval: 30s
 
-  # TODO: do we want 2 sims?
-  # TODO: do we want to make this the latest sim?
+
+  # TODO: 2x sims, quoting service
+
+  # TODO: do we want 2 sims? - 3 actually
+  # TODO: do we want to make this the latest sim? - yes
   # simulator:
   #   image: mojaloop/simulator:latest
   #   container_name: ml_simulator
