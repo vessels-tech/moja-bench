@@ -31,6 +31,18 @@ curl localhost:4001/health # account-lookup-service
 - 
 
 
+```bash
+# clone the postman repo somewhere
+cd ../ && git clone git@github.com:mojaloop/postman.git
+
+# install newman
+npm install -g newman
+
+
+./scripts/_setup_hub.sh
+```
+
+
 ## Example Transfer
 
 todo

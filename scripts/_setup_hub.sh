@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-curl --location --request POST 'http://localhost:3001/participants/Hub/accounts' \
---header 'Content-Type: application/json' \
---header 'FSPIOP-Source: payerfsp' \
---header 'Host: localhost:3001' \
---data-raw '{
-  "type": "HUB_MULTILATERAL_SETTLEMENT",
-  "currency": "USD"
-}'
+# point this to your mojaloop postman directory
+POSTMAN_DIR=${DIR}/../postman
+
+cd ${POSTMAN_DIR}
+
+newman run \
+  --delay-request=2000 \
+  --folder='Hub Account' \
+  --environment=environments/Mojaloop-Local-Docker-Compose.postman_environment.json \
+  OSS-New-Deployment-FSP-Setup.postman_collection.json
