@@ -9,6 +9,10 @@ services:
   ##
   # Core Services
   ##
+  # als-oracle-pathfinder:
+    # image: mojaloop/als-oracle-pathfinder:v8.7.1
+    # container_name: als_account-lookup-service
+
   account-lookup-service:
     image: mojaloop/account-lookup-service:v9.4.5
     container_name: als_account-lookup-service
@@ -183,59 +187,78 @@ services:
   ##
   # DFSP Simulators
   ## 
-  redis_dfspa:
-    image: "redis:5.0.4-alpine"
-    networks:
-      - ml-mojaloop-net
 
+  # TODO: should this be the new sims or the old?
   sim_dfspa:
-    image: mojaloop/mojaloop-simulator:latest
-    env_file: docker/sim-backend-dfspa.env
+    image: mojaloop/simulator:latest
+    container_name: simulator
     ports:
-      - "3400:3000"
-      - "3401:3001"
-      - "3403:3003"
-    networks:
-      - ml-mojaloop-net
-    depends_on:
-      - scheme-adapter_dfspa
+      - "8444:8444"
+    environment:
+      - LOG_LEVEL=info
+      - TRANSFERS_ENDPOINT=ml-api-adapter:3000
+      - TRANSFERS_FULFIL_RESPONSE_DISABLED=false
+      - QUOTES_ENDPOINT=quoting-service:3002
+    healthcheck:
+      test: ["CMD", "sh", "-c" ,"apk --no-cache add curl", ";", "curl", "http://localhost:8444/health"]
+      timeout: 20s
+      retries: 10
+      interval: 30s
 
-  scheme-adapter_dfspa:
-    image: "mojaloop/sdk-scheme-adapter:v9.4.5"
-    env_file: docker/scheme-adapter-dfspa.env
-    ports:
-      - "3500:3000"
-      - "3501:4000"
-    networks:
-      - ml-mojaloop-net
-    depends_on:
-      - redis_dfspa
 
-  redis_dfspb:
-    image: "redis:5.0.4-alpine"
-    networks:
-      - ml-mojaloop-net
+  # redis_dfspa:
+  #   image: "redis:5.0.4-alpine"
+  #   networks:
+  #     - ml-mojaloop-net
 
-  sim_dfspb:
-    image: mojaloop/mojaloop-simulator:latest
-    env_file: docker/sim-backend-dfspb.env
-    ports:
-      - "3600:3000"
-      - "3601:3001"
-      - "3603:3003"
-    networks:
-      - ml-mojaloop-net
-    depends_on:
-      - scheme-adapter_dfspb
+  # sim_dfspa:
+  #   image: mojaloop/mojaloop-simulator:latest
+  #   env_file: docker/sim-backend-dfspa.env
+  #   ports:
+  #     - "3400:3000"
+  #     - "3401:3001"
+  #     - "3403:3003"
+  #   networks:
+  #     - ml-mojaloop-net
+  #   depends_on:
+  #     - scheme-adapter_dfspa
 
-  scheme-adapter_dfspb:
-    image: "mojaloop/sdk-scheme-adapter:v9.4.5"
-    env_file: docker/scheme-adapter-dfspb.env
-    ports:
-      - "3700:3000"
-      - "3701:4000"
-    networks:
-      - ml-mojaloop-net
-    depends_on:
-      - redis_dfspb
+  # scheme-adapter_dfspa:
+  #   image: "mojaloop/sdk-scheme-adapter:v9.4.5"
+  #   env_file: docker/scheme-adapter-dfspa.env
+  #   ports:
+  #     - "3500:4000"
+  #     - "3501:4001"
+  #   networks:
+  #     - ml-mojaloop-net
+  #   depends_on:
+  #     - redis_dfspa
+
+  # redis_dfspb:
+  #   image: "redis:5.0.4-alpine"
+  #   networks:
+  #     - ml-mojaloop-net
+
+  # sim_dfspb:
+  #   image: mojaloop/mojaloop-simulator:latest
+  #   env_file: docker/sim-backend-dfspb.env
+  #   ports:
+  #     - "3600:3000"
+  #     - "3601:3001"
+  #     - "3603:3003"
+  #   networks:
+  #     - ml-mojaloop-net
+  #   depends_on:
+  #     - scheme-adapter_dfspb
+
+  # scheme-adapter_dfspb:
+  #   image: "mojaloop/sdk-scheme-adapter:v9.4.5"
+  #   env_file: docker/scheme-adapter-dfspb.env
+  #   ports:
+  #     - "3700:3000"
+  #     - "3701:4000"
+  #   networks:
+  #     - ml-mojaloop-net
+  #   depends_on:
+  #     - redis_dfspb
 
