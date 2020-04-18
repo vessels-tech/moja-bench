@@ -11,11 +11,9 @@ We might recycle some of this config for a PISP test environment or something.
 # run everything together
 docker-compose up -d
 
-
 # check it's running 
 # note: some of the health checks are reporting unhealthy or stuck on 'starting', when in fact they are ok
 docker-compose ps
-
 
 # see the services for yourself
 curl localhost:3000/health # ml-api-adapter
@@ -27,9 +25,7 @@ curl localhost:4001/health # account-lookup-service
 
 ## Setup the simulators etc.
 
-- register endpoints?
-- 
-
+> Note: this isn't completely working just yet. There's some callbacks that don't seem to be arriving at the right place
 
 ```bash
 # clone the postman repo somewhere
@@ -38,54 +34,12 @@ cd ../ && git clone git@github.com:mojaloop/postman.git
 # install newman
 npm install -g newman
 
-
 ./scripts/_setup_hub.sh
 ```
 
 
 ## Example Transfer
 
-todo
-
 ```bash
-CONTAINER_NAME=$(docker ps -f ancestor=mojaloop-simulator-backend --format '{{.Names}}')
-SIMULATOR_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$CONTAINER_NAME")
-
-localhost:3403/scenarios
-curl -X POST \
-  "http://localhost:3403/scenarios" \
-  -H 'Content-Type: application/json' \
-  -d '[
-    {
-        "name": "scenario1",
-        "operation": "postTransfers",
-        "body": {
-            "from": {
-                "displayName": "James Bush",
-                "idType": "MSISDN",
-                "idValue": "44123456789"
-            },
-            "to": {
-                "idType": "MSISDN",
-                "idValue": "44987654321"
-            },
-            "amountType": "SEND",
-            "currency": "USD",
-            "amount": "100",
-            "transactionType": "TRANSFER",
-            "note": "test payment",
-            "homeTransactionId": "123ABC"
-        }
-    },
-    {
-        "name": "scenario2",
-        "operation": "putTransfers",
-        "params": {
-            "transferId": "{{scenario1.result.transferId}}"
-        },
-        "body": {
-            "acceptQuote": true
-        }
-    }
-]'
+./scripts/_test_transfer.sh
 ```
