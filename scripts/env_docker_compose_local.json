@@ -204,27 +204,27 @@
         },
         {
             "key": "HOST_ACCOUNT_LOOKUP_ADMIN",
-            "value": "http://account-lookup-service-admin.local:4002",
+            "value": "http://localhost:4001",
             "enabled": true
         },
         {
             "key": "HOST_ACCOUNT_LOOKUP_SERVICE",
-            "value": "http://account-lookup-service.local:4002",
+            "value": "http://localhost:4002",
             "enabled": true
         },
         {
             "key": "HOST_BULK_API_ADAPTER",
-            "value": "http://bulk-api-adapter.local:3003",
+            "value": "http://localhost:3003",
             "enabled": true
         },
         {
             "key": "HOST_CENTRAL_LEDGER",
-            "value": "http://central-ledger.local:3001",
+            "value": "http://localhost:3001",
             "enabled": true
         },
         {
             "key": "HOST_CENTRAL_SETTLEMENT",
-            "value": "http://central-settlement.local:3007",
+            "value": "http://localhost:3007",
             "enabled": true
         },
         {
@@ -234,12 +234,12 @@
         },
         {
             "key": "HOST_ML_API",
-            "value": "http://ml-api-adapter.local:3000",
+            "value": "http://localhost:3000",
             "enabled": true
         },
         {
             "key": "HOST_ML_API_ADAPTER",
-            "value": "http://ml-api-adapter.local:3000",
+            "value": "http://localhost:3000",
             "enabled": true
         },
         {
@@ -249,22 +249,22 @@
         },
         {
             "key": "HOST_QUOTING_SERVICE",
-            "value": "http://quoting-service.local:3002",
+            "value": "http://localhost:3002",
             "enabled": true
         },
         {
             "key": "HOST_SIMULATOR",
-            "value": "http://moja-simulator.local:8444",
+            "value": "http://localhost:8444",
             "enabled": true
         },
         {
             "key": "HOST_SIMULATOR_K8S_CLUSTER",
-            "value": "http://simulator:8444",
+            "value": "http://sim_dfspa:8444",
             "enabled": true
         },
         {
             "key": "HOST_SWITCH_TRANSFERS",
-            "value": "http://ml-api-adapter.local:3000",
+            "value": "http://localhost:3000",
             "enabled": true
         },
         {

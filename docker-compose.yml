@@ -199,6 +199,8 @@ services:
       - TRANSFERS_ENDPOINT=ml-api-adapter:3000
       - TRANSFERS_FULFIL_RESPONSE_DISABLED=false
       - QUOTES_ENDPOINT=quoting-service:3002
+    networks:
+      - ml-mojaloop-net
     healthcheck:
       test: ["CMD", "sh", "-c" ,"apk --no-cache add curl", ";", "curl", "http://localhost:8444/health"]
       timeout: 20s
