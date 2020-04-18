@@ -24,6 +24,7 @@ curl localhost:3002/health # quoting-service
 curl localhost:4001/health # account-lookup-service
 
 
-
+# run the dfsp sims
+docker-compose -f docker-compose-sims.yml up -d
 
 ```

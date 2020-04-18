@@ -5,6 +5,10 @@ networks:
     name: ml-mojaloop-net
 
 services:
+  
+  ##
+  # Core Services
+  ##
   account-lookup-service:
     image: mojaloop/account-lookup-service:v9.4.5
     container_name: als_account-lookup-service
@@ -115,8 +119,6 @@ services:
   mysql-cl:
     image: mysql/mysql-server
     container_name: mysql_cl
-    logging:
-      driver: none
     ports:
       - "3307:3306"
     volumes:
@@ -178,27 +180,62 @@ services:
       start_period: 40s
       interval: 30s
 
+  ##
+  # DFSP Simulators
+  ## 
+  redis_dfspa:
+    image: "redis:5.0.4-alpine"
+    networks:
+      - ml-mojaloop-net
 
-  # TODO: 2x sims, quoting service
+  sim_dfspa:
+    image: mojaloop/mojaloop-simulator:latest
+    env_file: docker/sim-backend-dfspa.env
+    ports:
+      - "3400:3000"
+      - "3401:3001"
+      - "3403:3003"
+    networks:
+      - ml-mojaloop-net
+    depends_on:
+      - scheme-adapter_dfspa
 
-  # TODO: do we want 2 sims? - 3 actually
-  # TODO: do we want to make this the latest sim? - yes
-  # simulator:
-  #   image: mojaloop/simulator:latest
-  #   container_name: ml_simulator
-  #   ports:
-  #     - "8444:8444"
-  #   environment:
-  #     - LOG_LEVEL=info
-  #     - TRANSFERS_ENDPOINT=http://host.docker.internal:3000
-  #     - QUOTES_ENDPOINT=http://host.docker.internal:3002
-  #     - PARTIES_ENDPOINT=http://host.docker.internal:4002
-  #     - TRANSFERS_FULFIL_RESPONSE_DISABLED=false
-  #   networks:
-  #     - ml-mojaloop-net
-  #   healthcheck:
-  #     test: ["CMD", "sh", "-c" ,"apk --no-cache add curl", ";", "curl", "http://localhost:8444/health"]
-  #     timeout: 20s
-  #     retries: 10
-  #     interval: 30s
+  scheme-adapter_dfspa:
+    image: "mojaloop/sdk-scheme-adapter:v9.4.5"
+    env_file: docker/scheme-adapter-dfspa.env
+    ports:
+      - "3500:3000"
+      - "3501:4000"
+    networks:
+      - ml-mojaloop-net
+    depends_on:
+      - redis_dfspa
+
+  redis_dfspb:
+    image: "redis:5.0.4-alpine"
+    networks:
+      - ml-mojaloop-net
+
+  sim_dfspb:
+    image: mojaloop/mojaloop-simulator:latest
+    env_file: docker/sim-backend-dfspb.env
+    ports:
+      - "3600:3000"
+      - "3601:3001"
+      - "3603:3003"
+    networks:
+      - ml-mojaloop-net
+    depends_on:
+      - scheme-adapter_dfspb
+
+  scheme-adapter_dfspb:
+    image: "mojaloop/sdk-scheme-adapter:v9.4.5"
+    env_file: docker/scheme-adapter-dfspb.env
+    ports:
+      - "3700:3000"
+      - "3701:4000"
+    networks:
+      - ml-mojaloop-net
+    depends_on:
+      - redis_dfspb
 
