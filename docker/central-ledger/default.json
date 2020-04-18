@@ -7,7 +7,7 @@
   },
   "DATABASE": {
     "DIALECT": "mysql",
-    "HOST": "mysql",
+    "HOST": "mysql-cl",
     "PORT": 3306,
     "USER": "central_ledger",
     "PASSWORD": "password",

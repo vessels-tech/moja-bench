@@ -6,7 +6,7 @@ networks:
 
 services:
   account-lookup-service:
-    image: mojaloop/account-lookup-service:latest
+    image: mojaloop/account-lookup-service:v9.4.5
     container_name: als_account-lookup-service
     user: root
     command:
@@ -22,7 +22,6 @@ services:
       - mysql-als
       - central-ledger
     volumes:
-      - ./src:/opt/account-lookup-service/src
       - ./docker/account-lookup-service/default.json:/opt/account-lookup-service/config/default.json
       - ./docker/wait-for:/opt/wait-for
     healthcheck:
@@ -33,13 +32,7 @@ services:
 
   ml-api-adapter:
     image: mojaloop/ml-api-adapter:latest
-    # build:
-    #   context: .
-    #   cache_from:
-    #     - mojaloop/ml-api-adapter
-    #     - central-ledger
     container_name: ml_ml-api-adapter
-    # We must be root in order to install the health packages...
     user: root
     command:
       - "sh"
@@ -68,14 +61,14 @@ services:
   central-ledger:
     image: mojaloop/central-ledger:latest
     container_name: ml_central-ledger
-    # We must be root in order to install the health packages...
     user: root
     command:
       - "sh"
       - "-c"
       - "sh /opt/wait-for/wait-for-central-ledger.sh && node src/api/index.js"
+      # - "sh /opt/wait-for/wait-for-central-ledger.sh && tail -f /dev/null"
     links:
-      - mysql
+      - mysql-cl
       - kafka
     ports:
       - "3001:3001"
@@ -84,7 +77,7 @@ services:
        - ./docker/central-ledger/default.json:/opt/central-ledger/config/default.json
        - ./docker/wait-for:/opt/wait-for
     depends_on:
-      - mysql
+      - mysql-cl
       - kafka
     environment:
       - CLEDG_SIDECAR__DISABLED=true
@@ -98,8 +91,7 @@ services:
 
   mysql-cl:
     image: mysql/mysql-server
-    container_name: ml_mysql
-    # Disable logging as it is far too verbose for debugging locally
+    container_name: mysql_cl
     logging:
       driver: none
     ports:
@@ -122,7 +114,7 @@ services:
   
   mysql-als:
     image: mysql/mysql-server
-    container_name: als_mysql
+    container_name: mysql_als
     ports:
       - "3306:3306"
     volumes:
