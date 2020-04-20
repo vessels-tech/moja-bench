@@ -12,11 +12,11 @@ cd ${POSTMAN_DIR}
 # ths issue is likely in the `env_docker_compose_local.json` file, which sets up the config for the newman
 # tests
 
-newman run \
-  --delay-request=2000 \
-  --folder='p2p_money_transfer' \
-  --environment=${DIR}/env_docker_compose_local.json \
-  Golden_Path.postman_collection.json
+# newman run \
+#   --delay-request=2000 \
+#   --folder='p2p_money_transfer' \
+#   --environment=${DIR}/env_docker_compose_local.json \
+#   Golden_Path.postman_collection.json
 
 # newman run \
 #   --delay-request=2000 \
@@ -24,11 +24,11 @@ newman run \
 #   --environment=${DIR}/env_docker_compose_local.json \
 #   Golden_Path.postman_collection.json
 
-# newman run \
-#   --delay-request=2000 \
-#   --folder='p2p_happy_path SEND QUOTE' \
-#   --environment=${DIR}/env_docker_compose_local.json \
-#   Golden_Path.postman_collection.json
+newman run \
+  --delay-request=2000 \
+  --folder='p2p_happy_path SEND QUOTE' \
+  --environment=${DIR}/env_docker_compose_local.json \
+  Golden_Path.postman_collection.json
 
 # newman run \
 #   --delay-request=2000 \

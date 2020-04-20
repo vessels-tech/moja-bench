@@ -14,7 +14,7 @@ services:
     # container_name: als_account-lookup-service
 
   account-lookup-service:
-    image: mojaloop/account-lookup-service:v9.3.1
+    image: mojaloop/account-lookup-service:v9.3.0
     container_name: als_account-lookup-service
     user: root
     command:
