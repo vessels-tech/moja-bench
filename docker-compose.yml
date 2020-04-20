@@ -14,7 +14,7 @@ services:
     # container_name: als_account-lookup-service
 
   account-lookup-service:
-    image: mojaloop/account-lookup-service:v9.4.5
+    image: mojaloop/account-lookup-service:v9.3.0
     container_name: als_account-lookup-service
     user: root
     command:
@@ -32,6 +32,9 @@ services:
     volumes:
       - ./docker/account-lookup-service/default.json:/opt/account-lookup-service/config/default.json
       - ./docker/wait-for:/opt/wait-for
+    environment:
+      - "ALS_DISPLAY_ROUTES=false"
+      - "LOG_LEVEL=debug"
     healthcheck:
       test: ["CMD", "sh", "-c" ,"apk --no-cache add curl", ";", "curl", "http://localhost:4001/health"]
       timeout: 20s
@@ -39,7 +42,7 @@ services:
       interval: 30s
 
   ml-api-adapter:
-    image: mojaloop/ml-api-adapter:latest
+    image: mojaloop/ml-api-adapter:v9.3.0
     container_name: ml_ml-api-adapter
     user: root
     command:
@@ -67,7 +70,7 @@ services:
       interval: 30s
 
   central-ledger:
-    image: mojaloop/central-ledger:latest
+    image: mojaloop/central-ledger:v9.3.0-hotfix.1
     container_name: ml_central-ledger
     user: root
     command:
@@ -98,7 +101,7 @@ services:
       interval: 30s
 
   quoting-service:
-    image: mojaloop/quoting-service:latest
+    image: mojaloop/quoting-service:v9.3.2-snapshot
     container_name: ml_quoting-service
     user: root
     ports:
@@ -190,15 +193,20 @@ services:
 
   # TODO: should this be the new sims or the old?
   sim_dfspa:
-    image: mojaloop/simulator:latest
+    image: mojaloop/simulator:v9.3.2
     container_name: simulator
     ports:
       - "8444:8444"
     environment:
-      - LOG_LEVEL=info
       - TRANSFERS_ENDPOINT=ml-api-adapter:3000
       - TRANSFERS_FULFIL_RESPONSE_DISABLED=false
       - QUOTES_ENDPOINT=quoting-service:3002
+      - PARTIES_ENDPOINT=account-lookup-service:4002
+      - TRANSFERS_FULFILMENT=XoSz1cL0tljJSCp_VtIYmPNw-zFUgGfbUqf69AagUzY
+      - TRANSFERS_CONDITION=HOr22-H3AfTDHrSkPjJtVPRdKouuMkDXTR4ejlQa8Ks
+      - TRANSFERS_ILPPACKET=AQAAAAAAAADIEHByaXZhdGUucGF5ZWVmc3CCAiB7InRyYW5zYWN0aW9uSWQiOiIyZGY3NzRlMi1mMWRiLTRmZjctYTQ5NS0yZGRkMzdhZjdjMmMiLCJxdW90ZUlkIjoiMDNhNjA1NTAtNmYyZi00NTU2LThlMDQtMDcwM2UzOWI4N2ZmIiwicGF5ZWUiOnsicGFydHlJZEluZm8iOnsicGFydHlJZFR5cGUiOiJNU0lTRE4iLCJwYXJ0eUlkZW50aWZpZXIiOiIyNzcxMzgwMzkxMyIsImZzcElkIjoicGF5ZWVmc3AifSwicGVyc29uYWxJbmZvIjp7ImNvbXBsZXhOYW1lIjp7fX19LCJwYXllciI6eyJwYXJ0eUlkSW5mbyI6eyJwYXJ0eUlkVHlwZSI6Ik1TSVNETiIsInBhcnR5SWRlbnRpZmllciI6IjI3NzEzODAzOTExIiwiZnNwSWQiOiJwYXllcmZzcCJ9LCJwZXJzb25hbEluZm8iOnsiY29tcGxleE5hbWUiOnt9fX0sImFtb3VudCI6eyJjdXJyZW5jeSI6IlVTRCIsImFtb3VudCI6IjIwMCJ9LCJ0cmFuc2FjdGlvblR5cGUiOnsic2NlbmFyaW8iOiJERVBPU0lUIiwic3ViU2NlbmFyaW8iOiJERVBPU0lUIiwiaW5pdGlhdG9yIjoiUEFZRVIiLCJpbml0aWF0b3JUeXBlIjoiQ09OU1VNRVIiLCJyZWZ1bmRJbmZvIjp7fX19
+      - LOG_LEVEL=debug
+
     networks:
       - ml-mojaloop-net
     healthcheck:
