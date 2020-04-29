@@ -1,8 +1,8 @@
-# Moja Bench
+# Moja DC
 
-Scratch repo for playing aroud with simple mojaloop benchmarks from docker-compose.
+A Docker-compose based Mojaloop development environment. Useful for when you need the bare-bones Mojaloop for developing or testing.
 
-We might recycle some of this config for a PISP test environment or something.
+By default, the `docker-compose.yml` file contains all of the services needed for a basic Mojaloop environment, including some simulators. If you want to write code for one or more of the services, refer to [using moja-dc in my environment](#using-moja-dc-in-my-environment) below.
 
 
 ## Running everything
@@ -20,7 +20,6 @@ curl localhost:3000/health # ml-api-adapter
 curl localhost:3001/health # central-ledger
 curl localhost:3002/health # quoting-service
 curl localhost:4001/health # account-lookup-service
-
 ```
 
 ## Setup the simulators etc.
@@ -43,3 +42,15 @@ npm install -g newman
 ```bash
 ./scripts/_test_transfer.sh
 ```
+
+
+## Using moja-dc in my Environment
+
+In order to get _your code_ running along this environment, you have a few options:
+1. Build your own docker containers locally for any service you need, give them a name such at `mojaloop/quoting-service:local`, and update the docker-compose file to use this container
+  > This is rather slow (even with docker layer caching) as you will need to rebuild your containers each time you make a code change.
+2. Build your own containers like above, but _mount_ your code into them for _rapid_ develoment
+  > Note: this can cause issues with node_modules, especially those which require native bindings, such as `node-rdkafka`.
+3. Disable whatever service you want to write code for in `docker-compose.yml`. Run that service locally on your machine, and update your config to match - most often, this is a change such as changing a hostname from something like `quoting-service:3002` to `localhost:3002`.
+  > This is the approach most mojaloop developers take at the time of writing, but requires extra work to ensure that your config files are set up appropriately so services outside of docker can talk to those inside, and vice-versa
+

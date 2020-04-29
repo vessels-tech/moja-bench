@@ -191,7 +191,8 @@ services:
   # DFSP Simulators
   ## 
 
-  # TODO: should this be the new sims or the old?
+  # TODO: We are using the legacy simulator here, but we need to update this to use the `mojaloop/mojaloop-simulator` image
+
   sim_dfspa:
     image: mojaloop/simulator:v9.3.2
     container_name: simulator
@@ -216,6 +217,9 @@ services:
       interval: 30s
 
 
+  # New simulators and required dependencies.
+  # refer to note above
+  # 
   # redis_dfspa:
   #   image: "redis:5.0.4-alpine"
   #   networks:
